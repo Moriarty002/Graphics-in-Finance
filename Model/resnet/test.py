@@ -17,7 +17,7 @@ import os
 # REG_OUTPUT = 8
 BATCH_SIZE = 8
 DATASET_ROOT2 = '/home/pwrai/myn105u/photo_square_test'
-PATH_TO_WEIGHTS = './Model_ResNet_Reg-8_square.pth'
+PATH_TO_WEIGHTS = './Model_all_best.pth'
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"   # "%d" % CUDA_DEVICES
 

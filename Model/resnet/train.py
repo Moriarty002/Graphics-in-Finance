@@ -29,7 +29,7 @@ REG_OUTPUT = 1
 BATCH_SIZE = 8  
 EPOCH_SIZE = 1
 #DATASET_ROOT = './seg_train'
-DATASET_ROOT1 = "../images/mix"
+DATASET_ROOT1 = "../images/50"
 PATH_TO_WEIGHTS = './Model_all_best.pth'
 RB_PATH_TO_WEIGHTS = './Model_recently_best.pth'
 
