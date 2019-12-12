@@ -16,9 +16,9 @@ for i in range(1, 2):
   (train_acc,train_loss, train_loss2,test_data_loader)=train(i,train_acc,train_loss, CUDA_DEVICES = 0)
   test_acc=test(test_acc,test_data_loader, CUDA_DEVICES = 0)
 
-
 lentr=len(train_loss)
 lentr+=1
+
 
 '''
 lente=len(test_acc)
