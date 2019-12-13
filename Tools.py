@@ -16,18 +16,44 @@ import os
 # plt.rcParams['font.family']='SimHei' # 顯示中文('SimHei' for MacOS)
 from sklearn import preprocessing
 
+
 global df1
 
 def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在回傳0 並建立
     PATH_TO_STOCKDATA = './stock_data'
-    target = stockcode + '.json'
+    raw_target = stockcode + '.json'
+
+    PATH_input_json = './stock_data/'+stockcode+'.json'
+
+    PATH_TO_STOCKDATA_INDEX = './stock_data_index'
+    index_target = stockcode + '_index.json'
+    
+    rawInFile = 0
+    indexInFile = 0
+    df_raw = pd.DataFrame()
+    df_index = 0
+    
     for root, dirs, files in os.walk(PATH_TO_STOCKDATA):
-        if target in files:
-            print('find data at : '+root)
-            return 1
-    print("Data is not be found ,crawling data from ''https://www.twse.com.tw/exchangeReport/STOCK_DAY?'',\n please wait ")
-    get_stockdata(stockcode)
-    return 0
+        if raw_target in files:
+            print('found data ['+ raw_target + ']at : '+root)
+            rawInFile = 1
+            df_raw=pd.read_json(PATH_input_json)
+
+    if(rawInFile==0):
+        print("["+ raw_target + "] is not be found ,crawling data from ''https://www.twse.com.tw/exchangeReport/STOCK_DAY?'',\nplease wait ")
+        df_raw=get_stockdata(stockcode)
+
+    for root, dirs, files in os.walk(PATH_TO_STOCKDATA_INDEX):
+        if index_target in files:
+            print('found data ['+ index_target + ']at : '+root)
+            indexInFile = 1
+            df_index=1
+
+    if(indexInFile==0):
+        print(" ["+ index_target + "] is not be found ,stock_index_generator is running,\nplease wait ")
+        df_index = 0
+        
+    return df_raw,df_index
 
 
 def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock_data/XXXXX.json 裡面
@@ -86,10 +112,11 @@ def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock
     pd.set_option('display.max_rows', 1000)
     pd.set_option('display.max_columns', 1000)
     indexNames = df1[df1['成交金額'] == 0].index
-    df1 = df1.drop('')
     df1 = df1.drop(indexNames)
     df1 = df1.reset_index(drop=True)
-    df1.to_json('./stock_data/'+stockcode+'.json')
+    df1.to_json('./stock_data/' + stockcode + '.json')
+    return (df1)
+
 
 
 def image_generate(DATE):  # 輸入時間、已存在json的股票代碼 輸出加上今日往前推算19日的指標圖片 日期須>=20100226
@@ -98,10 +125,13 @@ def image_generate(DATE):  # 輸入時間、已存在json的股票代碼 輸出�
 
 def get_list_ans(stockcode):
 
-
     PATH_input_json = './stock_data/'+stockcode+'.json'
     df1 = pd.read_json(PATH_input_json)
 
+    for index, row in df1.iteritems():
+        indexNames = df1[df1[index] == '--'].index
+        df1 = df1.drop(indexNames)
+        
     df1.sort_index(inplace=True)
     df1 = df1.fillna(0)
     df1 = df1.drop(range(14))
@@ -150,4 +180,4 @@ def get_list_ans(stockcode):
 
 
 if __name__ == "__main__":
-    checkCodeInDir("0052")
+    pass
