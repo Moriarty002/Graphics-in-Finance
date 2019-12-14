@@ -179,10 +179,6 @@ def get_list_ans(stockcode):
     List_ans = np.append(List_ans, 0)
     import sys
     np.set_printoptions(threshold = sys.maxsize)
-    print(List_ans.size)
-    print(List_ans)
-    print(List_price.size)
-    print(List_price)
     return List_ans, List_price
 
 
