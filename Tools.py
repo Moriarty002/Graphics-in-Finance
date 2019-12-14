@@ -140,7 +140,7 @@ def get_list_ans(stockcode):
     List_Low = np.array(df1['最低價'])
     List_Hig = np.array(df1['最高價'])
     List_price = np.array(df1['收盤價'])
-    List_ans = np.zeros(19)
+    List_ans = np.zeros(19,dtype=int)
     for i in range(19, List_price.size-1):
         LL = float(List_Low[i-1])
         LH = float(List_Hig[i-1])
@@ -152,7 +152,6 @@ def get_list_ans(stockcode):
         CP = float(List_price[i])
         RP = float(List_price[i + 1])
 
-
         cnt = 2
         while(CP == LP):
             LP = float(List_price[i-cnt])
@@ -163,11 +162,11 @@ def get_list_ans(stockcode):
             cnt = cnt + 1
 
         if LP > CP and RP>CP:
-            List_ans = np.append(List_ans, 1)
+            List_ans = np.append(List_ans, int(1))
         elif CP > LP and CP>RP:
-            List_ans = np.append(List_ans, -1)
+            List_ans = np.append(List_ans, int(-1))
         else:
-            List_ans = np.append(List_ans, 0)
+            List_ans = np.append(List_ans, int(0))
         '''
         if LL>CH and RL>CH :
             List_ans=np.append(List_ans,1)

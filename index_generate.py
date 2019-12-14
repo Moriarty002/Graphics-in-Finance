@@ -468,7 +468,7 @@ def stock_index_generator(df_in,stockcode):
 def Normalize_pd(df1):
     df2=df1[['RSI_6','RSI_12','K','D','BIAS','WMR','EMA_12','EMA_26','MACD','psy_6','MTM_6','SAR_6','DM+(DMI)','DM-(DMI)','TR(DMI)','+DI(DMI)','-DI(DMI)','ADX(DMI)','Trend']].copy()
 
-    def min_max(inputCol):
+    def min_max(inputCol,df2):
         arr=np.array( [float(i) for i in df2[inputCol]])
         arr = np.reshape(arr, (-1,1))
         min_max_scaler=preprocessing.MinMaxScaler()
@@ -477,8 +477,165 @@ def Normalize_pd(df1):
 
     min_maxdf = pd.DataFrame()
     for i in ['RSI_6','RSI_12','K','D','BIAS','WMR','EMA_12','EMA_26','MACD','psy_6','MTM_6','SAR_6','DM+(DMI)','DM-(DMI)','TR(DMI)','+DI(DMI)','-DI(DMI)','ADX(DMI)','Trend']:
-        min_max(i)
+        min_max(i,df2)
     return min_maxdf
+
+def Normalize_pd_V2(new_idx):
+
+    def min_max2(inputCol,new_idx):
+        arr=np.array( [float(i) for i in new_idx[inputCol]])
+        arr = np.reshape(arr, (-1,1))
+        min_max_scaler=preprocessing.MinMaxScaler()
+        a=min_max_scaler.fit_transform(arr)              
+        min_maxdf2[inputCol]=np.reshape(a*255, (-1)).tolist()
+    min_maxdf2 = pd.DataFrame()
+    for i in ['RSI','KD','BIAS','WMR','MACD','PSY','SAR','CDP','+DI(DMI)','-DI(DMI)','ADX(DMI)']:
+        min_max2(i,new_idx)
+    return min_maxdf2
+
+
+def stock_index_generator_V2(df_in,stockcode):
+    df2=df_in[['RSI_6','RSI_12','K','D','BIAS','WMR','EMA_12','EMA_26','MACD','psy_6','MTM_6','SAR_6','DM+(DMI)','DM-(DMI)','TR(DMI)','+DI(DMI)','-DI(DMI)','ADX(DMI)','Trend']].copy()
+    new_idx=pd.DataFrame()
+    #rsi
+    rsi6=np.array([float(i) for i in df2['RSI_6']])
+    rsi12=np.array([float(i) for i in df2['RSI_12']])
+    rst=np.array(0)
+    for i in range(1,rsi6.size):
+        tmp=0
+        if(rsi6[i]>90):
+            tmp=-1
+        elif(rsi6[i]>80):
+            tmp=-0.5
+        elif(rsi6[i]<10):
+            tmp=1
+        elif(rsi6[i]<20):
+            tmp=0.5
+        dif=rsi6[i]-rsi12[i]
+        mul=(rsi6[i-1]-rsi12[i-1])*dif
+        if (abs(mul-0) < 0.0000001) or (mul < 0):
+            if (dif > 0) or ((abs(dif-0) < 0.0000001) and rsi6[i-1] < rsi12[i-1]):
+                tmp=tmp+2
+            else:
+                tmp=tmp-2
+        rst=np.append(rst,tmp)
+    new_idx['RSI']=np.reshape(rst, (-1)).tolist()
+    #KD
+    k=np.array([float(i) for i in df2['K']])
+    d=np.array([float(i) for i in df2['D']])
+    rst=np.array(0)
+    for i in range(1,k.size):
+        dif=k[i]-d[i]
+        mul=dif*(k[i-1]*d[i-1])
+        tmp=0
+        if (abs(mul-0) < 0.0000001) or (mul < 0):
+            if (dif > 0) or ((abs(dif-0) < 0.0000001) and k[i-1] < d[i-1]):
+                tmp=1
+            else:
+                tmp=-1
+        w=0
+        if k[i]>80 or k[i]<20 :
+            w=2
+        elif k[i]>70 or k[i]<30 :
+            w=1
+        rst=np.append(rst,w*tmp)
+    new_idx['KD']=np.reshape(rst, (-1)).tolist()
+    #BIAS
+    bias=np.array([float(i) for i in df2['BIAS']])
+    if(bias[0]<-4.5):
+        rst=np.array(2)
+    elif(bias[0]<-3):
+        rst=np.array(1)
+    elif(bias[0]>5):
+        rst=np.array(-2)
+    elif(bias[0]>3.5):
+        rst=np.array(-1)
+    else:
+        rst=np.array(0)
+    for i in range(1,bias.size):
+        if(bias[i]<-4.5):
+            rst=np.append(rst,2)
+        elif(bias[i]<-3):
+            rst=np.append(rst,1)
+        elif(bias[i]>5):
+            rst=np.append(rst,-2)
+        elif(bias[i]>3.5):
+            rst=np.append(rst,-1)
+        else:
+            rst=np.append(rst,0)
+    new_idx['BIAS']=np.reshape(rst, (-1)).tolist()
+    #WMR
+    wr=np.array([float(i) for i in df2['WMR']])
+    if(wr[0]<=20):
+        rst=np.array(-2)
+    elif(wr[0]<35):
+        rst=np.array(-1)
+    elif(wr[0]<65):
+        rst=np.array(0)
+    elif(wr[0]<80):
+        rst=np.array(1)
+    else:
+        rst=np.array(2)
+    for i in range(1,wr.size):
+        if(wr[i]<=20):
+            rst=np.append(rst,-2)
+        elif(wr[i]<35):
+            rst=np.append(rst,-1)
+        elif(wr[i]<65):
+            rst=np.append(rst,0)
+        elif(wr[i]<80):
+            rst=np.append(rst,1)
+        else:
+            rst=np.append(rst,2)
+    new_idx['WMR']=np.reshape(rst, (-1)).tolist()
+    #MACD
+    macd=np.array([float(i) for i in df2['MACD']])
+    dif=np.array([float(i) for i in df2['EMA_12']])-np.array([float(i) for i in df2['EMA_26']])
+    if macd[0]>0 and dif[0]>0:
+        rst=np.array(2)
+    elif dif[0]>0:
+        rst=np.array(1)
+    elif macd[0]>0:
+        rst=np.array(-1)
+    else:
+        rst=np.array(-2)
+    for i in range(1,macd.size):
+        if macd[i]>0 and dif[i]>0:
+            rst=np.append(rst,2)
+        elif dif[i]>0:
+            rst=np.append(rst,1)
+        elif macd[i]>0:
+            rst=np.append(rst,-1)
+        else:
+            rst=np.append(rst,-2)
+    new_idx['MACD']=np.reshape(rst, (-1)).tolist()
+    #PSY
+    new_idx['PSY']=df2['psy_6'].copy()
+    #SAR
+    sar=np.array([float(i) for i in df2['SAR_6']])
+    dif=k-sar
+    rst=np.array(0)
+    for i in range(1,k.size):
+        mul=dif[i]*dif[i-1]
+        tmp=0
+        if (abs(mul-0) < 0.0000001) or (mul < 0):
+            if (dif[i] > 0) or ((abs(dif[i]-0) < 0.0000001) and dif[i-1]<0):
+                tmp=1
+            else:
+                tmp=-1
+        rst=np.append(rst,tmp)
+    new_idx['SAR']=np.reshape(rst, (-1)).tolist()
+    #CDP
+    new_idx['CDP']=df2['Trend'].copy()
+    #DMI
+    l=['+DI(DMI)','-DI(DMI)','ADX(DMI)']
+    for i in l:
+        new_idx[i]=df2[i].copy()
+    pd.set_option('display.max_rows', 1000)
+    pd.set_option('display.max_columns', 1000)
+    new_idx.to_json('./stock_data_index_V2/' + stockcode + '_index_V2.json')
+
+    return new_idx
 
 
 
@@ -487,9 +644,14 @@ if  __name__ == "__main__":
     PATH_input_json = './stock_data/'+stockcode+'.json'
     df=stock_index_generator(pd.read_json(PATH_input_json),stockcode)
     print(df)
-
     min_maxdf=Normalize_pd(df)
     print(min_maxdf)
+
+    df_v2 = stock_index_generator_V2(df,stockcode)
+    print(df_v2)
+    min_maxdfV2 = Normalize_pd_V2(df_v2)
+    print(min_maxdfV2)
+
     pass
 
 

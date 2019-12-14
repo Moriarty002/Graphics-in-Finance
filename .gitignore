@@ -1,3 +1,5 @@
 images/
 *.pyc
 image_output/
+image_output_V2/
+*.jpg
