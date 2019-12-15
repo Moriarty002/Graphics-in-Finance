@@ -27,9 +27,9 @@ torch.backends.cudnn.benchmark = False
 #DATASET_ROOT = args.path
 REG_OUTPUT = 1
 BATCH_SIZE = 8  
-EPOCH_SIZE = 1
+EPOCH_SIZE = 10
 #DATASET_ROOT = './seg_train'
-DATASET_ROOT1 = "../images/mix"
+DATASET_ROOT1 = "../images/56"
 PATH_TO_WEIGHTS = './Model_all_best.pth'
 RB_PATH_TO_WEIGHTS = './Model_recently_best.pth'
 
@@ -82,7 +82,7 @@ def train(i,train_acc,train_loss, CUDA_DEVICES = 0, DEVICE_IDS = [0]):
 
         # model.fc = my_output_module
         # model.fc=nn.Linear(f(256)*f(256)*2048, REG_OUTPUT)
-        model=model.cuda()
+        model=model.cuda(CUDA_DEVICES)
         model=nn.DataParallel(model, device_ids = DEVICE_IDS)
     if i!=1:
         model=torch.load(PATH_TO_WEIGHTS)
@@ -110,6 +110,8 @@ def train(i,train_acc,train_loss, CUDA_DEVICES = 0, DEVICE_IDS = [0]):
         # training_corrects = 0
 
         for i, (inputs, labels) in enumerate(train_data_loader):
+
+            print(inputs.size())
             inputs = inputs.cuda() #CUDA_DEVICES)
             labels = labels.cuda() #CUDA_DEVICES)
 

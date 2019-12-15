@@ -1,2 +1,4 @@
 *.pth
-./models/
+*.pyc
+models/
+__pycache__/

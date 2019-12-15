@@ -16,7 +16,7 @@ import os
 
 # REG_OUTPUT = 8
 BATCH_SIZE = 8
-DATASET_ROOT2 = '/home/pwrai/myn105u/photo_square_test'
+DATASET_ROOT2 = '../images/50'
 PATH_TO_WEIGHTS = './Model_all_best.pth'
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"   # "%d" % CUDA_DEVICES
@@ -101,6 +101,8 @@ def test(test_acc,test_data_loader, CUDA_DEVICES = 0):
         for inputs, labels in test_data_loader:
             testing_loss = 0.0
             testing_loss2 = 0.0
+
+            print("size:", inputs.size())
             inputs = Variable(inputs.cuda())  # CUDA_DEVICES))
             labels = Variable(labels.cuda())  # CUDA_DEVICES))
             print('\n==================== Labels ====================\n')
@@ -112,6 +114,7 @@ def test(test_acc,test_data_loader, CUDA_DEVICES = 0):
             _, predictions = torch.max(outputs.data, 1)
             print("\n================= Predictions ==================\n")
             print(predictions)
+            
 
             correct_count += torch.sum(labels==predictions).int()
 
