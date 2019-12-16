@@ -111,7 +111,7 @@ def train(i,train_acc,train_loss, CUDA_DEVICES = 0, DEVICE_IDS = [0]):
 
         for i, (inputs, labels) in enumerate(train_data_loader):
 
-            print(inputs.size())
+            # print(inputs.size())
             inputs = inputs.cuda() #CUDA_DEVICES)
             labels = labels.cuda() #CUDA_DEVICES)
 
@@ -129,7 +129,7 @@ def train(i,train_acc,train_loss, CUDA_DEVICES = 0, DEVICE_IDS = [0]):
             # print("=========================")
             #print("preds:"+str(preds))
  
-            if i*BATCH_SIZE%1 == 0:
+            if i%10 == 0:
 
                 print("\n\n\n\n\n||||||||||||||||||||| BATCH-%d |||||||||||||||||||||\n" % i)
                 print("\n\t=================== Labels =====================\n\t")
@@ -141,7 +141,8 @@ def train(i,train_acc,train_loss, CUDA_DEVICES = 0, DEVICE_IDS = [0]):
                 print("\n\t================= Epoch Loss ===================\n")
                 print(f'\tTraining:', train_loss) 
 
-            progress = i*BATCH_SIZE / len(train_sampler)
+            progress = (i+1)*BATCH_SIZE / len(train_sampler)
+            progress = 100 if progress>=100 else progress
             print(f"\t[Training Progress]: {progress:.4f}% [Batch Loss]: {loss.data:.2f}", end='\r')
      
             training_loss += loss.item() * inputs.size(0)
