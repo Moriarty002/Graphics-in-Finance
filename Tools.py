@@ -57,8 +57,7 @@ def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在�
         PATH_TO_STOCKDATA_INDEX = './stock_data_index/'
         index_target = stockcode+'_index.json'
         df_index = pd.read_json(PATH_TO_STOCKDATA_INDEX+index_target)
-    return df_raw, df_index
-    
+    return df_raw,df_index
 
 
 def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock_data/XXXXX.json 裡面
@@ -190,8 +189,107 @@ def get_list_ans(stockcode):
     List_ans_V3=np.append(List_ans_V3, 0)
     import sys
     np.set_printoptions(threshold = sys.maxsize)
-    return List_ans, List_price,List_ans_V3
+    return List_ans, List_price, List_ans_V3
+def get_list_ans(stockcode):
+
+    PATH_input_json = './stock_data/'+stockcode+'.json'
+    df1 = pd.read_json(PATH_input_json)
+
+    for index, row in df1.iteritems():
+        indexNames = df1[df1[index] == '--'].index
+        df1 = df1.drop(indexNames)
         
+    df1.sort_index(inplace=True)
+    df1 = df1.fillna(0)
+    df1 = df1.drop(range(14))
+    df1 = df1.reset_index(drop=True)
+
+    List_Low = np.array(df1['最低價'])
+    List_Hig = np.array(df1['最高價'])
+    List_price = np.array(df1['收盤價'])
+    List_ans = np.zeros(19,dtype=int)
+    List_ans_V3=np.zeros(19,dtype=int)
+    for i in range(19, List_price.size-1):
+        LL = float(List_Low[i-1])
+        LH = float(List_Hig[i-1])
+        CL = float(List_Low[i])
+        CH = float(List_Hig[i])
+        RL = float(List_Low[i+1])
+        RH = float(List_Hig[i+1])
+        LP = float(List_price[i-1])
+        CP = float(List_price[i])
+        RP = float(List_price[i + 1])
+
+        cnt = 2
+        while(CP == LP):
+            LP = float(List_price[i-cnt])
+            cnt = cnt+1
+        cnt = 2
+        while(CP == RP):
+            RP = float(List_price[i+cnt])
+            cnt = cnt + 1
+        
+        if LP > CP and RP>CP:
+            List_ans = np.append(List_ans, int(1))
+        elif CP > LP and CP>RP:
+            List_ans = np.append(List_ans, int(-1))
+        else:
+            List_ans = np.append(List_ans, int(0))
+        
+        if RP > CP:
+            List_ans_V3 = np.append(List_ans_V3,int(1))
+        else:
+            List_ans_V3 = np.append(List_ans_V3,int(-1))
+        '''
+        if LL>CH and RL>CH :
+            List_ans=np.append(List_ans,1)
+        elif CL>=LH and CL>RH:
+            List_ans=np.append(List_ans,-1)
+        else:
+            List_ans=np.append(List_ans,0)
+        '''
+    List_ans = np.append(List_ans, 0)
+    List_ans_V3=np.append(List_ans_V3, 0)
+    import sys
+    np.set_printoptions(threshold = sys.maxsize)
+    return List_ans, List_price, List_ans_V3
+    
+def get_list_ans_V4(stockcode):
+
+    PATH_input_json = './stock_data/'+stockcode+'.json'
+    df1 = pd.read_json(PATH_input_json)
+
+    for index, row in df1.iteritems():
+        indexNames = df1[df1[index] == '--'].index
+        df1 = df1.drop(indexNames)
+        
+    df1.sort_index(inplace=True)
+    df1 = df1.fillna(0)
+    df1 = df1.drop(range(14))
+    df1 = df1.reset_index(drop=True)
+
+    List_price = np.array(df1['收盤價']).astype(np.float64)
+    List_ans = np.zeros(19,dtype=int)
+    for i in range(19, List_price.size - 1):
+        
+
+        MaxHigh = max(List_price[i-19:i])
+        MinLow = min(List_price[i-19:i])
+
+        CP = (float(List_price[i-19])+float(List_price[i]))/2
+ 
+        if MaxHigh > CP 
+            List_ans = np.append(List_ans, int(1))
+        elif MaxHigh > CP 
+            List_ans = np.append(List_ans, int(-1))
+        else:
+            List_ans = np.append(List_ans, int(0))
+        
+    List_ans = np.append(List_ans, 0)
+    import sys
+    np.set_printoptions(threshold = sys.maxsize)
+    return List_ans, List_price
+
 
 
 if __name__ == "__main__":

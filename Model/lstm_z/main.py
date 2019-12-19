@@ -12,7 +12,8 @@ def generate_df_affect_by_n_days(series, n, index=False):
         raise Exception("The Length of series is %d, while affect by (n=%d)." % (len(series), n))
     df = pd.DataFrame()
     for i in range(n):
-        df['c%d' % i] = series.tolist()[i:-(n - i)]
+        df['c%d' % i] = series.tolist()[i: - (n - i)]
+        
     df['y'] = series.tolist()[n:]
     if index:
         df.index = series.index[n:]
