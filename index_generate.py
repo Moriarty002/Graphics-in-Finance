@@ -54,6 +54,7 @@ def BIAS(n, index):
     Mean=np.mean(data)
     ans=100*(Mtoday-Mean)/Mean
     return ans
+    
 def WMR(n, index):
     global df1
     Mtoday=float(df1.at[index,'收盤價'])

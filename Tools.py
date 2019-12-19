@@ -190,6 +190,7 @@ def get_list_ans(stockcode):
     import sys
     np.set_printoptions(threshold = sys.maxsize)
     return List_ans, List_price, List_ans_V3
+    
 def get_list_ans(stockcode):
 
     PATH_input_json = './stock_data/'+stockcode+'.json'
@@ -283,7 +284,7 @@ def get_list_ans_V4(stockcode):
             if(num>maxv):
                 maxv=num
                 Max=j
-            elif(num<min):
+            elif(num<minv):
                 minv=num
                 Min=j
         if Max==Mid:
@@ -291,7 +292,7 @@ def get_list_ans_V4(stockcode):
         elif Min==Mid:
             List_ans = np.append(List_ans, 1)
         else:
-            List_ans = np.append(List_ans, 0)        
+            List_ans = np.append(List_ans, 0)
     List_ans = np.append(List_ans, 0)
     import sys
     np.set_printoptions(threshold = sys.maxsize)

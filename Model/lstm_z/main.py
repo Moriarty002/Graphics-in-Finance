@@ -11,6 +11,7 @@ def generate_df_affect_by_n_days(series, n, index=False):
     if len(series) <= n:
         raise Exception("The Length of series is %d, while affect by (n=%d)." % (len(series), n))
     df = pd.DataFrame()
+
     for i in range(n):
         df['c%d' % i] = series.tolist()[i: - (n - i)]
         
@@ -20,11 +21,14 @@ def generate_df_affect_by_n_days(series, n, index=False):
     return df
 
 
-def readData(column='high', n=30, all_too=True, index=False, train_end=-300):
-    df = pd.read_csv("399300.csv", index_col=0)
+def readData(column='最高價', n=30, all_too=True, index=False, train_end=-300):
+    df = pd.read_json("0050_index.json")
     df.sort_index(inplace=True)
 
-    df.index = list(map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"), df.index))
+    for i in range(len(df)):
+        df['日期'].iloc[i]=df['日期'] .iloc[i].replace(df['日期'].iloc[i][0:3],str(int(df['日期'].iloc[i][0:3])+1911))
+    
+    df.index = list(map(lambda x: datetime.datetime.strptime(x, "%Y/%m/%d"), df['日期']))
 
     df_column = df[column].copy()
     df_column_train, df_column_test = df_column[:train_end], df_column[train_end - n:]
@@ -76,7 +80,7 @@ LR = 0.0001
 EPOCH = 100
 train_end = -500
 # 数据集建立
-df, df_all, df_index = readData('收盘价', n=n, train_end=train_end)
+df, df_all, df_index = readData('漲跌價差', n=n, train_end=train_end)
 
 df_all = np.array(df_all.tolist())
 plt.plot(df_index, df_all, label='real-data')
