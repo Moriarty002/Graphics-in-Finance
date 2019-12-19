@@ -54,11 +54,11 @@ def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在�
         df_index=index_generate.stock_index_generator(df_raw,stockcode)
         df_index = 0
     else:
-            PATH_TO_STOCKDATA_INDEX = './stock_data_index/'
-            index_target = stockcode+'_index.json'
-            df_index = pd.read_json(PATH_TO_STOCKDATA_INDEX+index_target)
-        
-    return df_raw,df_index
+        PATH_TO_STOCKDATA_INDEX = './stock_data_index/'
+        index_target = stockcode+'_index.json'
+        df_index = pd.read_json(PATH_TO_STOCKDATA_INDEX+index_target)
+    return df_raw, df_index
+    
 
 
 def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock_data/XXXXX.json 裡面
