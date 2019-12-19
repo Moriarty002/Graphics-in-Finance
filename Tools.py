@@ -271,20 +271,27 @@ def get_list_ans_V4(stockcode):
     List_price = np.array(df1['收盤價']).astype(np.float64)
     List_ans = np.zeros(19,dtype=int)
     for i in range(19, List_price.size - 1):
-        
-
-        MaxHigh = max(List_price[i-19:i])
-        MinLow = min(List_price[i-19:i])
-
-        CP = (float(List_price[i-19])+float(List_price[i]))/2
- 
-        if MaxHigh > CP 
-            List_ans = np.append(List_ans, int(1))
-        elif MaxHigh > CP 
-            List_ans = np.append(List_ans, int(-1))
+        Begin=i-19
+        End=i-1
+        Mid=i-10
+        Max=i-19
+        Min=i-19
+        maxv=List_price[Begin]
+        minv=List_price[Begin]
+        for j in range(Begin,End):
+            num=List_price[j]
+            if(num>maxv):
+                maxv=num
+                Max=j
+            elif(num<min):
+                minv=num
+                Min=j
+        if Max==Mid:
+            List_ans = np.append(List_ans, -1)
+        elif Min==Mid:
+            List_ans = np.append(List_ans, 1)
         else:
-            List_ans = np.append(List_ans, int(0))
-        
+            List_ans = np.append(List_ans, 0)        
     List_ans = np.append(List_ans, 0)
     import sys
     np.set_printoptions(threshold = sys.maxsize)
