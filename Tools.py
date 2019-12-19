@@ -10,6 +10,7 @@ import seaborn as sns
 import numpy as np
 import datetime
 from dateutil.relativedelta import relativedelta
+import index_generate
 import csv
 import time
 import os
@@ -31,7 +32,7 @@ def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在�
     rawInFile = 0
     indexInFile = 0
     df_raw = pd.DataFrame()
-    df_index = 0
+    df_index = pd.DataFrame()
     
     for root, dirs, files in os.walk(PATH_TO_STOCKDATA):
         if raw_target in files:
@@ -47,11 +48,15 @@ def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在�
         if index_target in files:
             print('found data ['+ index_target + ']at : '+root)
             indexInFile = 1
-            df_index=1
 
-    if(indexInFile==0):
-        print(" ["+ index_target + "] is not be found ,stock_index_generator is running,\nplease wait ")
+    if (indexInFile == 0):
+        print(" [" + index_target + "] is not be found ,stock_index_generator is running,\nplease wait ")
+        df_index=index_generate.stock_index_generator(df_raw,stockcode)
         df_index = 0
+    else:
+            PATH_TO_STOCKDATA_INDEX = './stock_data_index/'
+            index_target = stockcode+'_index.json'
+            df_index = pd.read_json(PATH_TO_STOCKDATA_INDEX+index_target)
         
     return df_raw,df_index
 
