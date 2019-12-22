@@ -62,7 +62,7 @@ X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.1)
 model = buildManyToOneModel(X_train.shape,ndata)
 callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
 model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
-
+model.save('my_model.h5')
 
 
 
