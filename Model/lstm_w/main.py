@@ -37,10 +37,10 @@ def shuffle(X,Y):
     return X[randomList], Y[randomList]
 
 def splitData(X,Y,rate):
-    X_train = X[int(X.shape[0]*rate):]
-    Y_train = Y[int(Y.shape[0]*rate):]
-    X_val = X[:int(X.shape[0]*rate)]
-    Y_val = Y[:int(Y.shape[0]*rate)]
+    X_train = X[:int(X.shape[0]*rate)]
+    Y_train = Y[:int(Y.shape[0]*rate)]
+    X_val = X[int(X.shape[0]*rate):]
+    Y_val = Y[int(Y.shape[0]*rate):]
     return X_train, Y_train, X_val, Y_val
 
 def buildManyToOneModel(shape,nd):
@@ -56,13 +56,27 @@ ndata=28
 df = readTrain()
 df_norm = normalize(df)
 X_train, Y_train = buildTrain(df_norm, 30, 1)
-X_train, Y_train = shuffle(X_train, Y_train)
-X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.1)
+#X_train, Y_train = shuffle(X_train, Y_train)
+X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
 #train models
 model = buildManyToOneModel(X_train.shape,ndata)
 callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
 model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
 model.save('my_model.h5')
+#LOAD
+#from keras.models import load_model
+#model = load_model("./my_model.h5")
+
+Y_predict=model.predict(X_train)
+Y_val_predict=model.predict(X_val)
+plt.plot(Y_train,label='ans')
+plt.plot(Y_predict,label='predict')
+plt.plot(Y_val,label='ans2')
+plt.plot(Y_val_predict,label='predict2')
+plt.legend()
+plt.show()
+plt.cla()
+
 
 
 
