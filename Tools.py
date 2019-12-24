@@ -65,7 +65,7 @@ def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock
     date = "2010/01/01"
     inday = datetime.datetime.strptime(date, "%Y/%m/%d")
     ago = [(inday + relativedelta(months=+i)).strftime('%Y%m%d')
-            for i in range(109)]
+            for i in range(131)]
     month = ago[0]
 
     data = {
@@ -81,7 +81,7 @@ def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock
     print(month)
     time.sleep(3)
 
-    for month in ago[1:109]:
+    for month in ago[1:119]:
         data = {
             'response': 'json',
             'date': month,
