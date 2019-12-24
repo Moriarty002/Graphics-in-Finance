@@ -55,9 +55,13 @@ def buildManyToOneModel(shape,nd):
 ndata=28
 df = readTrain()
 df_norm = normalize(df)
-X_train, Y_train = buildTrain(df_norm, 30, 1)
+X_train_ori, Y_train_ori = buildTrain(df_norm, 30, 1)
 #X_train, Y_train = shuffle(X_train, Y_train)
+#cut the data to test
+X_train,Y_train,x__test,y_test = splitData(X_train_ori, Y_train_ori, 0.95)
+#cut the data to train & prove
 X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
+
 #train models
 model = buildManyToOneModel(X_train.shape,ndata)
 callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
