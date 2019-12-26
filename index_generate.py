@@ -221,6 +221,9 @@ def ADX(index, n_day):
     
     if index < n_day:
         return 0
+    elif (PDI + NDI)==0:
+        return 0
+        
     elif index == n_day:
         PDI = float(df1.loc[index, "+DI(DMI)"])
         NDI = float(df1.loc[index, "-DI(DMI)"])
