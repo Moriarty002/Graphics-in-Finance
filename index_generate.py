@@ -219,21 +219,21 @@ def ADX(index, n_day):
     global df1
     # ADX= [(+DI)- (-DI)] / [(+DI)+(-DI)] *100
     
+    PDI = float(df1.loc[index, "+DI(DMI)"])
+    NDI = float(df1.loc[index, "-DI(DMI)"])
+    
     if index < n_day:
         return 0
+        
     elif (PDI + NDI)==0:
-        return 0
+        return 0  
         
     elif index == n_day:
-        PDI = float(df1.loc[index, "+DI(DMI)"])
-        NDI = float(df1.loc[index, "-DI(DMI)"])
         ADX = (PDI - NDI) / (PDI + NDI) * 100
         return ADX
-    else:
-        PDI = float(df1.loc[index, "+DI(DMI)"])
-        NDI = float(df1.loc[index, "-DI(DMI)"])
-        ADX = float(df1.loc[index-1, "ADX(DMI)"])*(1-1/n_day) + ((PDI - NDI)/(PDI + NDI)*100)/n_day
         
+    else:
+        ADX = float(df1.loc[index-1, "ADX(DMI)"])*(1-1/n_day) + ((PDI - NDI)/(PDI + NDI)*100)/n_day
         return ADX
 '''
 1.  先求出昨日行情的CDP值(亦稱均價)
