@@ -75,7 +75,7 @@ plt.show()
 plt.cla()
 #train models
 print(X_train.shape)
-'''
+
 model = buildManyToManyModel(X_train.shape)
 callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
 model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
@@ -90,12 +90,6 @@ model = load_model("./my_model.h5")
 Y_predict=model.predict(X_train)
 Y_val_predict=model.predict(X_val)
 
+print(Y_predict.shape)
+print(Y_val_predict.shape)
 
-for i in range(Y_predict.shape[0]):
-    plt.plot(Y_predict[i], label='predict')
-
-plt.legend()
-plt.show()
-plt.cla()
-
-'''
