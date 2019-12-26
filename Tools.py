@@ -78,7 +78,7 @@ def get_stockdata(stockcode):  # 接從網路抓股票代碼 並儲存在./stock
     df1 = pd.DataFrame(result['data'])
     df1.columns = result['fields']
     print(month)
-    time.sleep(3)
+    time.sleep(6)
 
     for month in ago[1:119]:
         data = {
