@@ -11,8 +11,8 @@ import Tools
 from time import sleep
 import os
 
-def readTrain():
-    df_raw, df = Tools.checkCodeInDir('0050')
+def readTrain(stock_num):
+    df_raw, df = Tools.checkCodeInDir(stock_num)
     df_raw.sort_index(inplace=True)
     df.sort_index(inplace=True)
     clist=['開盤價','收盤價','最高價','最低價','RSI_6','RSI_12','K','D','BIAS','WMR','EMA_12','EMA_26','MACD','psy_6','MTM_6','SAR_6','DM+(DMI)','DM-(DMI)','TR(DMI)','+DI(DMI)','-DI(DMI)','ADX(DMI)','CDP','AH','NH','NL','AL','Trend']
@@ -52,34 +52,34 @@ def buildManyToOneModel(shape,nd):
     model.summary()
     return model
 
-ndata=28
-df = readTrain()
-df_norm = normalize(df)
-X_train_ori, Y_train_ori = buildTrain(df_norm, 30, 1)
-#X_train, Y_train = shuffle(X_train, Y_train)
-#cut the data to test
-X_train,Y_train,x__test,y_test = splitData(X_train_ori, Y_train_ori, 0.95)
-#cut the data to train & prove
-X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
+def stock_train(stock_num):
+    ndata=28
+    df = readTrain(stock_num)
+    df_norm = normalize(df)
+    X_train_ori, Y_train_ori = buildTrain(df_norm, 30, 1)
+    #X_train, Y_train = shuffle(X_train, Y_train)
+    #cut the data to test
+    X_train,Y_train,x__test,y_test = splitData(X_train_ori, Y_train_ori, 0.95)
+    #cut the data to train & prove
+    X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
 
-#train models
-model = buildManyToOneModel(X_train.shape,ndata)
-callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
-model.save('my_model.h5')
-#LOAD
-#from keras.models import load_model
-#model = load_model("./my_model.h5")
+    #train models
+    model = buildManyToOneModel(X_train.shape,ndata)
+    callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
+    model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
+    model.save('withidx/'+stock_num+'.h5')
+    #LOAD
+    #from keras.models import load_model
+    #model = load_model("./.h5")
 
-Y_predict=model.predict(X_train)
-Y_val_predict=model.predict(X_val)
-plt.plot(Y_train,label='ans')
-plt.plot(Y_predict,label='predict')
-plt.plot(Y_val,label='ans2')
-plt.plot(Y_val_predict,label='predict2')
-plt.legend()
-plt.show()
-plt.cla()
+    Y_predict=model.predict(X_train)
+    Y_val_predict=model.predict(X_val)
+    plt.plot(Y_train,label='ans')
+    plt.plot(Y_predict,label='predict')
+    plt.plot(Y_val,label='ans2')
+    plt.plot(Y_val_predict,label='predict2')
+    plt.legend()
+    plt.savefig('withidx/'+stock_num+'_withidx.jpg')
 
 
 
