@@ -42,7 +42,10 @@ def KD(n, index, K_before, D_before):
     data=df1.loc[index-(n-1):index+1,'收盤價']
     Max=float(max(data))
     Min=float(min(data))
-    RSV=(Mtoday-Min)/(Max-Min) *100
+    if (Max-Min)==0 :
+        RSV=0
+    else:
+        RSV=(Mtoday-Min)/(Max-Min) *100
     K=K_before*0.6667+RSV*0.3333
     D=D_before*0.6667+K*0.3333
     return (K, D)

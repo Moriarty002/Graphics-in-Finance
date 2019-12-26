@@ -86,12 +86,12 @@ def stock_train(stock_num,df_index,train=True):
     b=Y_val.size
     c=Y_test.size
     print('OC')
-    print(selfMSE(Y_predict[a+b:a+b+c],Y_train_ori[a+b:a+b+c]))
+    print(selfMSE(Y_predict[0:a+b],Y_train_ori[0:a+b]))
     
     Y_train_ori=denormalize(Y_train_ori,dfmean['收盤價'],dfdiff['收盤價'])
     Y_predict=denormalize(Y_predict,dfmean['收盤價'],dfdiff['收盤價'])
     
-    print(selfMSE(Y_predict[a+b:a+b+c],Y_train_ori[a+b:a+b+c]))
+    print(selfMSE(Y_predict[0:a+b],Y_train_ori[0:a+b]))
     
     
     # plt.plot(range(Y_train_ori.size),Y_train_ori,label='ans')
