@@ -52,7 +52,6 @@ def checkCodeInDir(stockcode):  # 查詢是否存在，存在回傳1 不存在�
     if (indexInFile == 0):
         print(" [" + index_target + "] is not be found ,stock_index_generator is running,\nplease wait ")
         df_index=index_generate.stock_index_generator(df_raw,stockcode)
-        df_index = 0
     else:
         PATH_TO_STOCKDATA_INDEX = './stock_data_index/'
         index_target = stockcode+'_index.json'
