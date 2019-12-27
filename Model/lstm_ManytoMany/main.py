@@ -11,6 +11,9 @@ import Tools
 from time import sleep
 import os
 
+
+PREDICT_DAY = 7
+
 def readTrain():
     df_raw, df = Tools.checkCodeInDir('0050')
     df_raw.sort_index(inplace=True)
@@ -53,10 +56,27 @@ def buildManyToManyModel(shape):
     model.summary()
     return model
 
+def multiData2Squeense(Y_train):
+    Y_train_tmp = np.zeros((Y_train.shape[0],Y_train.shape[0]+PREDICT_DAY-1))
+
+    Y_train_sq = np.zeros(Y_train.shape[0]+PREDICT_DAY-1)
+
+    for i in range(Y_train.shape[0]):
+                Y_train_tmp[i,i:i+PREDICT_DAY] = np.squeeze(Y_train[i])
+                # print(Y_train[i][k][0])
+
+    # print(Y_train_tmp.shape)
+    # print(Y_train_tmp[:][i])
+    for i in range(Y_train_tmp.shape[1]):
+        # print(len(Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])]), Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])])
+        Y_train_sq[i] =  np.mean(Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])]) 
+
+    return Y_train_sq
+
 ndata=28
 df = readTrain()
 df_norm = normalize(df)
-X_train, Y_train = buildTrain(df_norm, 30, 30)
+X_train, Y_train = buildTrain(df_norm, PREDICT_DAY, PREDICT_DAY)
 #X_train, Y_train = shuffle(X_train, Y_train)
 X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
 
@@ -64,32 +84,70 @@ X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
 Y_train = Y_train[:,:,np.newaxis]
 Y_val = Y_val[:,:,np.newaxis]
 
+print(Y_train, Y_train.shape)
+print(Y_val, Y_val.shape)
 
 
-for i in range(30):
-    for k in range(30):
-        plt.plot(k+i,Y_train[i][k][0], label='ans'+str(i))
+Y_train_sq = multiData2Squeense(Y_train)
+
+plt.plot(range(len(Y_train_sq)),Y_train_sq, label='answer')
+
+
+# for i in range(len(Y_train)):
+#         plt.plot(range(i,i+30),Y_train[i], label='ans'+str(i))
+#         # print(Y_train[i][k][0])
     
-plt.legend()
-plt.show()
-plt.cla()
+# plt.legend()
+# plt.show()
+# plt.cla()
 #train models
 print(X_train.shape)
 
-model = buildManyToManyModel(X_train.shape)
-callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
-model.save('my_model.h5')
-'''
+# model = buildManyToManyModel(X_train.shape)
+# callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
+# model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
+# model.save('my_model.h5')
+
 #LOAD
 
-'''
+
 from keras.models import load_model
 model = load_model("./my_model.h5")
 
 Y_predict=model.predict(X_train)
 Y_val_predict=model.predict(X_val)
 
-print(Y_predict.shape)
-print(Y_val_predict.shape)
+Y_predict_sq = multiData2Squeense(Y_predict)
+
+
+print("Y_predict_sq: ", Y_predict_sq)
+
+plt.plot(range(len(Y_predict_sq)),Y_predict_sq, label='predict')
+
+# for i in range(Y_predict.shape[0]):
+#         plt.plot(range(i,i+30),Y_predict[i], label='predict')
+#         # print(Y_train[i][k][0])
+
+plt.legend()
+plt.show()
+plt.cla()
+
+Y_val_predict_sq = multiData2Squeense(Y_val_predict)
+Y_val_sq = multiData2Squeense(Y_val)
+
+plt.plot(range(len(Y_val_predict_sq)),Y_val_predict_sq, label='predict')
+plt.plot(range(len(Y_val_sq)),Y_val_sq, label='answer')
+
+
+
+# for i in range(Y_val_predict.shape[0]):
+#         plt.plot(range(i,i+30),Y_val_predict[i], label='predict')
+#         # print(Y_train[i][k][0])
+
+# for i in range(len(Y_val)):
+#         plt.plot(range(i,i+30),Y_val[i], label='ans'+str(i))
+
+plt.legend()
+plt.show()
+plt.cla()
 
