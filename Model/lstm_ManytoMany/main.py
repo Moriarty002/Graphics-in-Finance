@@ -12,7 +12,8 @@ from time import sleep
 import os
 
 
-PREDICT_DAY = 7
+PREDICT_DAY = 30
+EPOCH = 1000
 
 def readTrain(stockID = '0050'):
     df_raw, df = Tools.checkCodeInDir(stockID)
@@ -39,11 +40,11 @@ def shuffle(X,Y):
     np.random.shuffle(randomList)
     return X[randomList], Y[randomList]
 
-def splitData(X,Y,rate):
-    X_train = X[:int(X.shape[0]*rate)]
-    Y_train = Y[:int(Y.shape[0]*rate)]
-    X_val = X[int(X.shape[0]*rate):]
-    Y_val = Y[int(Y.shape[0]*rate):]
+def splitData(X,Y,final_index):
+    X_train = X[:int(X.shape[0]-final_index)]
+    Y_train = Y[:int(Y.shape[0]-final_index)]
+    X_val = X[int(X.shape[0]-final_index):]
+    Y_val = Y[int(Y.shape[0]-final_index):]
     return X_train, Y_train, X_val, Y_val
 
 
@@ -58,17 +59,12 @@ def buildManyToManyModel(shape):
 
 def multiData2Squeense(Y_train):
     Y_train_tmp = np.zeros((Y_train.shape[0],Y_train.shape[0]+PREDICT_DAY-1))
-
     Y_train_sq = np.zeros(Y_train.shape[0]+PREDICT_DAY-1)
 
     for i in range(Y_train.shape[0]):
-                Y_train_tmp[i,i:i+PREDICT_DAY] = np.squeeze(Y_train[i])
-                # print(Y_train[i][k][0])
+        Y_train_tmp[i,i:i+PREDICT_DAY] = np.squeeze(Y_train[i])
 
-    # print(Y_train_tmp.shape)
-    # print(Y_train_tmp[:][i])
     for i in range(Y_train_tmp.shape[1]):
-        # print(len(Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])]), Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])])
         Y_train_sq[i] =  np.mean(Y_train_tmp[:,i][np.nonzero(Y_train_tmp[:,i])]) 
 
     return Y_train_sq
@@ -77,7 +73,7 @@ def multiData2Squeense(Y_train):
 def train_model(stockID, X_train, Y_train, X_val, Y_val):
     model = buildManyToManyModel(X_train.shape)
     callback = EarlyStopping(monitor="loss", patience=10, verbose=1, mode="auto")
-    model.fit(X_train, Y_train, epochs=1000, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
+    model.fit(X_train, Y_train, epochs=EPOCH, batch_size=128, validation_data=(X_val, Y_val), callbacks=[callback])
     model.save('model_%s.h5' % stockID)
 
 
@@ -101,8 +97,8 @@ def test_model(stockID, X_train, Y_train, X_val, Y_val):
     Y_val_predict_sq = multiData2Squeense(Y_val_predict)
     Y_val_sq = multiData2Squeense(Y_val)
 
-    plt.plot(range(len(Y_val_predict_sq)),Y_val_predict_sq, label='predict')
-    plt.plot(range(len(Y_val_sq)),Y_val_sq, label='answer')
+    plt.plot(range(len(Y_val_predict_sq[-PREDICT_DAY:])),Y_val_predict_sq[-PREDICT_DAY:], label='predict')
+    plt.plot(range(len(Y_val_sq[-PREDICT_DAY:])),Y_val_sq[-PREDICT_DAY:], label='answer')
 
     plt.title("Test")
     plt.legend()
@@ -111,18 +107,24 @@ def test_model(stockID, X_train, Y_train, X_val, Y_val):
     plt.cla()
 
 
+
 def main():
 
-    ndata=28
-    stockIDs = ['0050']
+
+    stockIDs = ["2330","2317","2454","3008","1301","2412","1303","2891","1216","2882","2881","2886","2308","2884","1326","2002","2892","2885","2207","1101","2880","3045","2303","2474","2912","2382","2357","2327","2887","2801","2890","4938","2883","6505","2888","1402","4904","2395","1102","2301","9904","2105","2823","9910","2408"]
 
     for stockID in stockIDs:
+
+        filepath = "./stock_data/%s.json" % stockID
+
+        if not os.path.isfile(filepath):
+            continue
 
         df = readTrain(stockID)
         df_norm = normalize(df)
         X_train, Y_train = buildTrain(df_norm, PREDICT_DAY, PREDICT_DAY)
         #X_train, Y_train = shuffle(X_train, Y_train)
-        X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, 0.9)
+        X_train, Y_train, X_val, Y_val = splitData(X_train, Y_train, PREDICT_DAY*2-1)
 
         # from 2 dimmension to 3 dimension
         Y_train = Y_train[:,:,np.newaxis]
